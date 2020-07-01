@@ -3,21 +3,27 @@ import Card from "react-bootstrap/Card";
 import Table from "react-bootstrap/Table";
 import { useEffect } from "react";
 import Axios from "axios";
+import orderBy from "lodash/orderBy";
+import escapeRegExp from "lodash/escapeRegExp";
+import filter from "lodash/filter";
+import debounce from "lodash/debounce";
 
 const SameIssuerTable = (props) => {
   const { IssuerName } = props;
-  const [tableData, setTableData] = useState({});
-  const [order, setTableOrder] = useState([]);
+  const [tableData, setTableData] = useState([]);
   const [orderType, setOrderType] = useState("ASC");
+  const [searchString, setSearchString] = useState("");
+  const [filterData, setFilterData] = useState([]);
 
   useEffect(() => {
     if (IssuerName) {
       Axios.get(
-        `http://localhost:5000/ETfDescription/getETFWithSameIssuer/${IssuerName}`
+        `http://3.82.59.110/ETfDescription/getETFWithSameIssuer/State%20Street%20SPDR`
       )
         .then(({ data }) => {
           console.log(data);
           setTableData(data);
+          setFilterData(data);
         })
         .catch((err) => {
           console.log(err);
@@ -25,30 +31,46 @@ const SameIssuerTable = (props) => {
     }
   }, [IssuerName]);
 
-  useEffect(() => {
-    if (typeof tableData === "object") {
-      const order = Object.keys(tableData).sort();
-      setTableOrder(order);
-    }
-  }, [tableData]);
-
   const changeOrder = () => {
     if (orderType === "ASC") {
-      const order = Object.keys(tableData).sort().reverse();
+      const sortedData = orderBy(filterData, ["etfTicker"], ["asc"]);
+
       setOrderType("DSC");
-      setTableOrder(order);
+      setFilterData(sortedData);
     }
     if (orderType === "DSC") {
-      const order = Object.keys(tableData).sort();
+      const sortedData = orderBy(filterData, ["etfTicker"], ["desc"]);
       setOrderType("ASC");
-      setTableOrder(order);
+      setFilterData(sortedData);
     }
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (searchString < 1) {
+        return setFilterData(tableData);
+      }
+
+      const re = new RegExp(escapeRegExp(searchString), "i");
+      const isMatch = (result) => re.test(result.etfTicker);
+      setFilterData(filter(tableData, isMatch));
+    }, 300);
+  }, [searchString]);
+
+  const handleSearchChange = (e) => {
+    setSearchString(e.target.value);
   };
 
   return (
     <Card>
-      <Card.Header className="text-white bg-color-dark">
+      <Card.Header className="text-white bg-color-dark flex-row">
         ETF in Same Issuer
+        <input
+          className="margin-left-auto d-inline-block"
+          name="search"
+          onChange={debounce(handleSearchChange, 500, { leading: true })}
+          value={searchString}
+        />
       </Card.Header>
       <Card.Body className="padding-0 bg-color-dark overflow-auto height-50vh font-size-sm">
         <Table size="sm" striped bordered hover variant="dark">
@@ -62,15 +84,12 @@ const SameIssuerTable = (props) => {
             </tr>
           </thead>
           <tbody>
-            {typeof tableData === "object" &&
-              order.map((key) => (
-                <tr key={key}>
-                  <td>{key}</td>
-                  <td>{tableData[key] && tableData[key].ETFName}</td>
-                  <td>
-                    {" "}
-                    {tableData[key] && tableData[key].TotalAssetsUnderMgmt}
-                  </td>
+            {Array.isArray(filterData) &&
+              filterData.map(({ ETFName, TotalAssetsUnderMgmt, etfTicker }) => (
+                <tr key={etfTicker}>
+                  <td>{etfTicker && etfTicker}</td>
+                  <td>{ETFName && ETFName}</td>
+                  <td>{TotalAssetsUnderMgmt && TotalAssetsUnderMgmt}</td>
                 </tr>
               ))}
           </tbody>

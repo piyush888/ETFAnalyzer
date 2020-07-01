@@ -4,12 +4,17 @@ import Table from "react-bootstrap/Table";
 import { useEffect } from "react";
 import Axios from "axios";
 import PieChartModal from "./PieChartModal";
+import orderBy from "lodash/orderBy";
+import escapeRegExp from "lodash/escapeRegExp";
+import filter from "lodash/filter";
+import debounce from "lodash/debounce";
 
 const HoldingsTable = (props) => {
   const { ETF, startDate } = props;
-  const [tableData, setTableData] = useState({});
-  const [order, setTableOrder] = useState([]);
+  const [tableData, setTableData] = useState([]);
   const [orderType, setOrderType] = useState("ASC");
+  const [searchString, setSearchString] = useState("");
+  const [filterData, setFilterData] = useState([]);
 
   useEffect(() => {
     Axios.get(
@@ -17,40 +22,52 @@ const HoldingsTable = (props) => {
     )
       .then(({ data }) => {
         setTableData(data);
+        setFilterData(data);
       })
       .catch((err) => console.log(err));
-
-    // if (typeof data === "object") {
-    //   const order = Object.keys(data).sort();
-    //   setTableOrder(order);
-    // }
   }, [ETF, startDate]);
-
-  useEffect(() => {
-    if (typeof tableData === "object") {
-      const order = Object.keys(tableData).sort();
-      setTableOrder(order);
-    }
-  }, [tableData]);
 
   const changeOrder = () => {
     if (orderType === "ASC") {
-      const order = Object.keys(tableData).sort().reverse();
+      const sortedData = orderBy(tableData, ["TickerSymbol"], ["asc"]);
+
       setOrderType("DSC");
-      setTableOrder(order);
+      setTableData(sortedData);
     }
     if (orderType === "DSC") {
-      const order = Object.keys(tableData).sort();
+      const sortedData = orderBy(tableData, ["TickerSymbol"], ["desc"]);
       setOrderType("ASC");
-      setTableOrder(order);
+      setTableData(sortedData);
     }
   };
 
-  console.log(props);
+  useEffect(() => {
+    setTimeout(() => {
+      if (searchString < 1) {
+        return setFilterData(tableData);
+      }
+
+      const re = new RegExp(escapeRegExp(searchString), "i");
+      const isMatch = (result) => re.test(result.TickerSymbol);
+      setFilterData(filter(tableData, isMatch));
+    }, 300);
+  }, [searchString]);
+
+  const handleSearchChange = (e) => {
+    setSearchString(e.target.value);
+  };
+
   return (
     <Card>
+      {console.log(filterData)}
       <Card.Header className="text-white bg-color-dark flex-row">
         ETF Holdings
+        <input
+          className="margin-left-auto d-inline-block"
+          name="search"
+          onChange={debounce(handleSearchChange, 500, { leading: true })}
+          value={searchString}
+        />
         <PieChartModal data={tableData} element={"TickerWeight"} />
       </Card.Header>
       <Card.Body className="padding-0 bg-color-dark overflow-auto height-50vh font-size-sm">
@@ -65,12 +82,12 @@ const HoldingsTable = (props) => {
             </tr>
           </thead>
           <tbody>
-            {typeof tableData === "object" &&
-              order.map((key) => (
-                <tr key={key}>
-                  <td>{key}</td>
-                  <td>{tableData[key] && tableData[key].TickerName}</td>
-                  <td> {tableData[key] && tableData[key].TickerWeight} </td>
+            {Array.isArray(filterData) &&
+              filterData.map((data) => (
+                <tr key={data.TickerSymbol}>
+                  <td>{data.TickerSymbol}</td>
+                  <td>{data.TickerName && data.TickerName}</td>
+                  <td> {data.TickerWeight && data.TickerWeight} </td>
                 </tr>
               ))}
           </tbody>
