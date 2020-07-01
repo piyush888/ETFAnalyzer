@@ -1,5 +1,5 @@
 import sys
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from mongoengine import *
 import sys
@@ -15,7 +15,7 @@ import sys
 import getpass
 
 sys.path.append("..")
-app = Flask(__name__, static_folder='..webapplication/build', static_url_path='/')
+app = Flask(__name__, static_folder='/home/ubuntu/ETFAnalyzer/webapplication/build', static_url_path='/')
 
 CORS(app)
 
@@ -28,7 +28,7 @@ else:
 
 @app.route('/')
 def index():
-    return jsonify({"abc":"123"})
+    return render_template("index.html")
 
 ############################################
 # ETF Description Page
