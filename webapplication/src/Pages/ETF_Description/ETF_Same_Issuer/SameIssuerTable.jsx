@@ -18,7 +18,7 @@ const SameIssuerTable = (props) => {
   useEffect(() => {
     if (IssuerName) {
       Axios.get(
-        `http://3.82.59.110/ETfDescription/getETFWithSameIssuer/State%20Street%20SPDR`
+        `http://localhost:5000/ETfDescription/getETFWithSameIssuer/${IssuerName}`
       )
         .then(({ data }) => {
           console.log(data);
