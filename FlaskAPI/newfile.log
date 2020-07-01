@@ -1,0 +1,83 @@
+2020-07-01 14:20:57,763 Using selector: EpollSelector
+2020-07-01 14:20:58,559 Exception on /ETfDescription/EtfData/XLK/20200608 [GET]
+Traceback (most recent call last):
+  File "/home/piyush/Desktop/etf1903/venv/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/piyush/Desktop/etf1903/venv/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/piyush/Desktop/etf1903/venv/lib/python3.8/site-packages/flask_cors/extension.py", line 161, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+  File "/home/piyush/Desktop/etf1903/venv/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/piyush/Desktop/etf1903/venv/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/piyush/Desktop/etf1903/venv/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/piyush/Desktop/etf1903/venv/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/piyush/Desktop/etf/ETFAnalyzer/FlaskAPI/server.py", line 72, in SendETFHoldingsData
+    req = request.__dict__['environ']['REQUEST_URI']
+KeyError: 'REQUEST_URI'
+2020-07-01 14:20:59,568 Command saslStart with request id 1649760492 started on server ('18.213.229.80', 27017)
+2020-07-01 14:20:59,769 Command saslStart with request id 1649760492 on server ('18.213.229.80', 27017) succeeded in 200634 microseconds
+2020-07-01 14:20:59,790 Command saslContinue with request id 596516649 started on server ('18.213.229.80', 27017)
+2020-07-01 14:20:59,991 Command saslContinue with request id 596516649 on server ('18.213.229.80', 27017) succeeded in 201297 microseconds
+2020-07-01 14:20:59,992 Command saslContinue with request id 1189641421 started on server ('18.213.229.80', 27017)
+2020-07-01 14:21:00,196 Command saslContinue with request id 1189641421 on server ('18.213.229.80', 27017) succeeded in 203681 microseconds
+2020-07-01 14:21:00,201 Command find with request id 1025202362 started on server ('18.213.229.80', 27017)
+2020-07-01 14:21:00,403 Command find with request id 1025202362 on server ('18.213.229.80', 27017) succeeded in 202306 microseconds
+2020-07-01 14:21:01,005 Command saslStart with request id 1102520059 started on server ('18.213.229.80', 27017)
+2020-07-01 14:21:01,200 Command saslStart with request id 1102520059 on server ('18.213.229.80', 27017) succeeded in 194131 microseconds
+2020-07-01 14:21:01,221 Command saslContinue with request id 2044897763 started on server ('18.213.229.80', 27017)
+2020-07-01 14:21:01,415 Command saslContinue with request id 2044897763 on server ('18.213.229.80', 27017) succeeded in 193677 microseconds
+2020-07-01 14:21:01,415 Command saslContinue with request id 1967513926 started on server ('18.213.229.80', 27017)
+2020-07-01 14:21:01,609 Command saslContinue with request id 1967513926 on server ('18.213.229.80', 27017) succeeded in 193761 microseconds
+2020-07-01 14:21:01,610 Command find with request id 1365180540 started on server ('18.213.229.80', 27017)
+2020-07-01 14:21:02,000 Command find with request id 1365180540 on server ('18.213.229.80', 27017) succeeded in 388898 microseconds
+2020-07-01 14:21:21,707 Command find with request id 1726956429 started on server ('18.213.229.80', 27017)
+2020-07-01 14:21:26,309 Command find with request id 1726956429 on server ('18.213.229.80', 27017) succeeded in 4601203 microseconds
+2020-07-01 14:21:26,311 Command find with request id 336465782 started on server ('18.213.229.80', 27017)
+2020-07-01 14:21:26,923 Command find with request id 336465782 on server ('18.213.229.80', 27017) succeeded in 612089 microseconds
+2020-07-01 14:22:27,594 Command saslStart with request id 1973594324 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:27,789 Command saslStart with request id 1973594324 on server ('18.213.229.80', 27017) succeeded in 194228 microseconds
+2020-07-01 14:22:27,803 Command saslContinue with request id 149798315 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:27,997 Command saslContinue with request id 149798315 on server ('18.213.229.80', 27017) succeeded in 193652 microseconds
+2020-07-01 14:22:27,997 Command saslContinue with request id 2038664370 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:28,192 Command saslContinue with request id 2038664370 on server ('18.213.229.80', 27017) succeeded in 194776 microseconds
+2020-07-01 14:22:28,193 Command find with request id 1129566413 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:29,124 Command find with request id 1129566413 on server ('18.213.229.80', 27017) succeeded in 930197 microseconds
+2020-07-01 14:22:29,125 Command getMore with request id 184803526 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:30,648 Command getMore with request id 184803526 on server ('18.213.229.80', 27017) succeeded in 1522589 microseconds
+2020-07-01 14:22:30,700 Command find with request id 1911759956 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:32,368 Command find with request id 1911759956 on server ('18.213.229.80', 27017) succeeded in 1667287 microseconds
+2020-07-01 14:22:32,370 Command getMore with request id 137806862 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:36,644 Command getMore with request id 137806862 on server ('18.213.229.80', 27017) succeeded in 4273493 microseconds
+2020-07-01 14:22:36,855 Command find with request id 42999170 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:37,070 Command find with request id 42999170 on server ('18.213.229.80', 27017) succeeded in 214665 microseconds
+2020-07-01 14:22:37,127 Command find with request id 982906996 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:37,322 Command find with request id 982906996 on server ('18.213.229.80', 27017) succeeded in 194764 microseconds
+2020-07-01 14:22:37,409 Command find with request id 135497281 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:39,577 Command find with request id 135497281 on server ('18.213.229.80', 27017) succeeded in 2167529 microseconds
+2020-07-01 14:22:39,688 Command find with request id 1937477084 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:39,885 Command find with request id 1937477084 on server ('18.213.229.80', 27017) succeeded in 196100 microseconds
+2020-07-01 14:22:39,886 Command getMore with request id 1827336327 started on server ('18.213.229.80', 27017)
+2020-07-01 14:22:42,537 Command getMore with request id 1827336327 on server ('18.213.229.80', 27017) succeeded in 2650458 microseconds
+2020-07-01 14:23:08,436 Command find with request id 1548233367 started on server ('18.213.229.80', 27017)
+2020-07-01 14:23:10,205 Command find with request id 1548233367 on server ('18.213.229.80', 27017) succeeded in 1768770 microseconds
+2020-07-01 14:23:10,305 Command find with request id 610515434 started on server ('18.213.229.80', 27017)
+2020-07-01 14:23:10,501 Command find with request id 610515434 on server ('18.213.229.80', 27017) succeeded in 196162 microseconds
+2020-07-01 14:23:10,502 Command getMore with request id 1374344043 started on server ('18.213.229.80', 27017)
+2020-07-01 14:23:12,529 Command getMore with request id 1374344043 on server ('18.213.229.80', 27017) succeeded in 2027248 microseconds
+2020-07-01 14:23:12,638 Command find with request id 1477171087 started on server ('18.213.229.80', 27017)
+2020-07-01 14:23:12,843 Command find with request id 1477171087 on server ('18.213.229.80', 27017) succeeded in 204908 microseconds
+2020-07-01 14:23:12,903 Command find with request id 356426808 started on server ('18.213.229.80', 27017)
+2020-07-01 14:23:13,097 Command find with request id 356426808 on server ('18.213.229.80', 27017) succeeded in 194494 microseconds
+2020-07-01 14:24:08,495 Command find with request id 1975960378 started on server ('18.213.229.80', 27017)
+2020-07-01 14:24:08,700 Command find with request id 1975960378 on server ('18.213.229.80', 27017) succeeded in 204459 microseconds
+2020-07-01 14:24:08,752 Command find with request id 317097467 started on server ('18.213.229.80', 27017)
+2020-07-01 14:24:09,053 Command find with request id 317097467 on server ('18.213.229.80', 27017) succeeded in 301322 microseconds
+2020-07-01 14:24:09,127 Command find with request id 1892066601 started on server ('18.213.229.80', 27017)
+2020-07-01 14:24:10,726 Command find with request id 1892066601 on server ('18.213.229.80', 27017) succeeded in 1598783 microseconds
+2020-07-01 14:24:10,837 Command find with request id 927612902 started on server ('18.213.229.80', 27017)
+2020-07-01 14:24:11,033 Command find with request id 927612902 on server ('18.213.229.80', 27017) succeeded in 196138 microseconds
+2020-07-01 14:24:11,034 Command getMore with request id 1330573317 started on server ('18.213.229.80', 27017)
