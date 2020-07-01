@@ -25,6 +25,11 @@ if system_username == 'ubuntu':
     connection = MongoDBConnectors().get_pymongo_readonly_devlocal_production()
 else:
     connection = MongoDBConnectors().get_pymongo_readonly_devlocal_production()
+
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
+
 ############################################
 # ETF Description Page
 ############################################
