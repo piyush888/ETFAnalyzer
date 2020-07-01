@@ -6,7 +6,7 @@ system_username = getpass.getuser()
 
 if system_username == 'ubuntu':
     ''' Production to Production:'''
-    connection = MongoDBConnectors().get_pymongo_readWrite_production_production()
+    connection = MongoDBConnectors().get_pymongo_readonly_devlocal_production()
 else:
     ''' Dev Local to Production ReadOnly:
         Will need to comment out create_index() statements to use this connection '''
@@ -21,7 +21,7 @@ db = connection.ETF_db
 
 if system_username == 'ubuntu':
     ''' Production to Production:'''
-    motor_client = MongoDBConnectors().get_motorasync_readWrite_production_production()
+    motor_client = MongoDBConnectors().get_motorasync_readonly_devlocal_production()
 else:
     ''' Dev Local to Production ReadOnly:
         Will need to comment out create_index() statements to use this connection '''
@@ -36,8 +36,8 @@ motor_db = motor_client.ETF_db
 
 # Quotes Pipeline
 quotesCollection = db.QuotesData
-if system_username == 'ubuntu':
-    quotesCollection.create_index([("dateForData", DESCENDING), ("symbol", ASCENDING)])
+# if system_username == 'ubuntu':
+#     quotesCollection.create_index([("dateForData", DESCENDING), ("symbol", ASCENDING)])
 quotespipeline = [
     {'$match': ''},
     {'$unwind': '$data'},
@@ -56,8 +56,8 @@ quotespipeline = [
 
 # Trades Pipeline
 tradeCollection = db.TradesData
-if system_username == 'ubuntu':
-    tradeCollection.create_index([("dateForData", DESCENDING), ("symbol", ASCENDING)])
+# if system_username == 'ubuntu':
+#     tradeCollection.create_index([("dateForData", DESCENDING), ("symbol", ASCENDING)])
 tradespipeline = [
     {'$match': ''},
     {'$unwind': '$data'},
@@ -76,18 +76,18 @@ tradespipeline = [
 
 # Daily Open Close Collection
 dailyopencloseCollection = db.DailyOpenCloseCollection
-if system_username == 'ubuntu':
-    dailyopencloseCollection.create_index([("dateForData", DESCENDING), ("Symbol", ASCENDING)], unique=True)
+# if system_username == 'ubuntu':
+#     dailyopencloseCollection.create_index([("dateForData", DESCENDING), ("Symbol", ASCENDING)], unique=True)
 
 # Arbitrage
 arbitragecollection = db.ArbitrageCollection
-if system_username == 'ubuntu':
-    arbitragecollection.create_index([("dateOfAnalysis", DESCENDING), ("ETFName", ASCENDING)], unique=True)
+# if system_username == 'ubuntu':
+#     arbitragecollection.create_index([("dateOfAnalysis", DESCENDING), ("ETFName", ASCENDING)], unique=True)
 
 # Arbitrage Per Minute
 arbitrage_per_min = db.ArbitragePerMin
-if system_username == 'ubuntu':
-    arbitrage_per_min.create_index([('Timestamp', DESCENDING)])
+# if system_username == 'ubuntu':
+#     arbitrage_per_min.create_index([('Timestamp', DESCENDING)])
 
 # Trade Aggregate Minute for all Tickers.
 # Cursor for pulling data (PyMongo Cursor)
