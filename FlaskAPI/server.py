@@ -28,7 +28,7 @@ else:
 
 @app.route('/')
 def index():
-    return app.send_static_file('index.html')
+    return jsonify({"abc":"123"})
 
 ############################################
 # ETF Description Page
