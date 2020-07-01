@@ -11,11 +11,13 @@ import math
 import ast
 from datetime import datetime, timedelta
 import traceback
-import sys
+import sys, os, pathlib
 import getpass
 
 sys.path.append("..")
-app = Flask(__name__, static_folder='/home/ubuntu/ETFAnalyzer/webapplication/build', static_url_path='/')
+path = pathlib.Path(os.getcwd()).parent
+path = os.path.abspath(os.path.join(path, 'webapplication/build'))
+app = Flask(__name__, static_folder=path, static_url_path='/')
 
 CORS(app)
 
