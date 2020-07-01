@@ -27,7 +27,7 @@ class ETF_Description extends React.Component {
   componentDidMount() {
     const { startDate, ETF } = this.props;
     Axios.get(
-      `http://localhost:5000/ETfDescription/EtfData/${ETF}/${startDate}`
+      `http://3.82.59.110/ETfDescription/EtfData/${ETF}/${startDate}`
     )
       .then((res) => {
         const { ETFDataObject, SimilarTotalAsstUndMgmt } = res.data;
