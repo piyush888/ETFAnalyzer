@@ -14,7 +14,6 @@ import {
 } from "amazon-cognito-identity-js";
 
 import { withRouter } from 'react-router';
-import setAuthToken from "./setToken";
 
 const divStyle = {
   paddingTop: '10%',
@@ -45,7 +44,7 @@ export const signIn = (
       localStorage.setItem("Login-TimeStamp", result.getIdToken().getIssuedAt())
       localStorage.setItem("TimeStamp", result.idToken.payload["custom:timestamp"] || 0);
       console.log(result.idToken.payload.sub);
-      setAuthToken(result.getIdToken().jwtToken)
+      
       history.push("/Live-Arbitrage");  // or whatever route you want a signed in user to be redirected to
     },
     onFailure(err) {

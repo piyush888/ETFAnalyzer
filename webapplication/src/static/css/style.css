@@ -100,3 +100,17 @@ p {
 .padding-1px {
   padding: 1px;
 }
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}
+
+.recharts-cartesian-axis-tick {
+  font-size: 0.8rem;
+  font-family: Roboto, sans-serif;
+  color: white;
+}
