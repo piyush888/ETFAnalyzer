@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Route, BrowserRouter as Router, Redirect } from 'react-router-dom'
+import { Route, BrowserRouter as Router, Redirect, Switch } from 'react-router-dom'
 import Container from 'react-bootstrap/Container'
 
 import Former from './Component/Form.js';
@@ -99,12 +99,12 @@ class App extends Component {
         {/* <Route path="/HistoricalArbitrage" render={() => <HistoricalArbitrage startDate ={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitFn} />} /> */}
         {/* <Route path="/Live-Arbitrage-Single" render={() => <Live_Arbitrage_Single ETF={this.state.ETF} />} /> */}
         {/* <Route path="/Live-Arbitrage" render={() => <Live_Arbitrage ETF={this.state.ETF} />} /> */}
-        
-        <PrivateRoute path="/ETF-Description" startDate={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitNewETF} component={ETF_Description}/>
-        <PrivateRoute path="/HistoricalArbitrage" component={HistoricalArbitrage} startDate ={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitFn} />
-        <PrivateRoute path="/Live-Arbitrage-Single" component={Live_Arbitrage_Single} ETF={this.state.ETF} />
-        <PrivateRoute path="/Live-Arbitrage" component={Live_Arbitrage} ETF={this.state.ETF} />
-
+        <Switch>
+          <PrivateRoute path="/ETF-Description" startDate={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitNewETF} component={ETF_Description}/>
+          <PrivateRoute path="/HistoricalArbitrage" component={HistoricalArbitrage} startDate ={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitFn} />
+          <PrivateRoute path="/Live-Arbitrage-Single" component={Live_Arbitrage_Single} ETF={this.state.ETF} />
+          <PrivateRoute path="/Live-Arbitrage" component={Live_Arbitrage} ETF={this.state.ETF} />
+        </Switch>
         <Route path="/SignUp" render={() => <SignUpFormPage />} />
         <Route path="/Login" component={SignInFormPage} />
         <Route path="/EmailVerification" component={EmailVerification} />
