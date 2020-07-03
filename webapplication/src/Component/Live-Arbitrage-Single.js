@@ -52,7 +52,7 @@ class Live_Arbitrage extends React.Component{
 
     fetchETFLiveData(){
         // Load the Historical Arbitrgae Data for Today 
-        axios.get(`http://localhost:5000/ETfLiveArbitrage/Single/${this.props.ETF}`).then(res =>{
+        axios.get(`/ETfLiveArbitrage/Single/${this.props.ETF}`).then(res =>{
             console.log("fetchETFLiveData");
             console.log(res);
             this.setState({
