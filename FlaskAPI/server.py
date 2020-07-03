@@ -211,8 +211,8 @@ from MongoDB.PerMinDataOperations import PerMinDataOperations
 
 @app.route('/ETfLiveArbitrage/AllTickers')
 def SendLiveArbitrageDataAllTickers():
-    token = request.headers['Authorization'].split(' ')[1]
-    print(token)
+    # token = request.headers['Authorization'].split(' ')[1]
+    # print(token)
     try:
         live_data = PerMinDataOperations().LiveFetchPerMinArbitrage()
         live_data.rename(columns={'symbol': 'Symbol'},inplace=True)

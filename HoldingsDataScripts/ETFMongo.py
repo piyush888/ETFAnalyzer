@@ -69,22 +69,25 @@ class ETF(mongoengine.Document):
 
     holdings = mongoengine.EmbeddedDocumentListField(Holdings)
 
-    if getpass.getuser() == 'ubuntu':
-        meta = {
-            'indexes': [
-                {
-                    'fields': ['-FundHoldingsDate', 'ETFTicker'],
-                    'unique': True,
-                    'name': 'Query_Index_1'
-                }
-            ],
-            'db_alias': 'ETF_db',
-            'collection': 'ETFHoldings'
-        }
-    else:
-        meta = {
-            'db_alias': 'ETF_db',
-            'collection': 'ETFHoldings'
-        }
-
+    # if getpass.getuser() == 'ubuntu':
+    #     meta = {
+    #         'indexes': [
+    #             {
+    #                 'fields': ['-FundHoldingsDate', 'ETFTicker'],
+    #                 'unique': True,
+    #                 'name': 'Query_Index_1'
+    #             }
+    #         ],
+    #         'db_alias': 'ETF_db',
+    #         'collection': 'ETFHoldings'
+    #     }
+    # else:
+    #     meta = {
+    #         'db_alias': 'ETF_db',
+    #         'collection': 'ETFHoldings'
+    #     }
+    meta = {
+        'db_alias': 'ETF_db',
+        'collection': 'ETFHoldings'
+    }
 # ETF.create_index({ETF.ETFTicker: 1, ETF.FundHoldings_date: -1},{unique: True})
