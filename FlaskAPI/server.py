@@ -122,8 +122,6 @@ def FetchPastArbitrageData(ETFName, date):
                          'Etf Mover',
                          'Most Change%',
                          'T', 'T+1']
-    print(date)
-    print(type(date))
     # Retreive data for Components
     data, pricedf, PNLStatementForTheDay, scatterPlotData = RetrieveETFArbitrageData(etfname=ETFName, date=date,
                                                                                      magnitudeOfArbitrageToFilterOn=0)
@@ -154,7 +152,6 @@ def FetchPastArbitrageData(ETFName, date):
 
     # Sort the data frame on time since Sell and Buy are concatenated one after other
     data = data.sort_index()
-    print(data)
     # Time Manpulation
     data.index = data.index.time
     data.index = data.index.astype(str)
@@ -176,12 +173,17 @@ def FetchPastArbitrageData(ETFName, date):
     data = data[ColumnsForDisplay]
     # PNL for all dates for the etf
     print("Price Df")
-    print(pricedf)
+    print(data)
+
+    allData['SignalCategorization'] = json.dumps(CategorizeSignals(ArbitrageDf=data, ArbitrageColumnName='$Arbitrage',PriceColumn='T',Pct_change=False))
 
     data=data.reset_index(drop=True)
-    allData['etfhistoricaldata'] = data.to_json()
     
+    allData['etfhistoricaldata'] = data.to_json()
+    allData['ArbitrageCumSum']=data[['$Arbitrage','Time']].to_dict('records')
     allData['etfPrices'] = pricedf.to_csv(sep='\t', index=False)
+    print("PNLStatementForTheDay")
+    print(PNLStatementForTheDay)
     allData['PNLStatementForTheDay'] = json.dumps(PNLStatementForTheDay)
     allData['scatterPlotData'] = json.dumps(scatterPlotData)
     allData['etfmoversDictCount'] = json.dumps(etfmoversDictCount)
@@ -211,8 +213,6 @@ from MongoDB.PerMinDataOperations import PerMinDataOperations
 
 @app.route('/ETfLiveArbitrage/AllTickers')
 def SendLiveArbitrageDataAllTickers():
-    # token = request.headers['Authorization'].split(' ')[1]
-    # print(token)
     try:
         live_data = PerMinDataOperations().LiveFetchPerMinArbitrage()
         live_data.rename(columns={'symbol': 'Symbol'},inplace=True)
@@ -237,10 +237,10 @@ from FlaskAPI.Components.LiveCalculations.helperLiveArbitrageSingleETF import fe
 @app.route('/ETfLiveArbitrage/Single/<etfname>')
 def SendLiveArbitrageDataSingleTicker(etfname):
     PerMinObj = PerMinDataOperations()
-    res = fecthArbitrageANDLivePrices(etfname=etfname, FuncETFPrices=PerMinObj.FetchFullDayPricesForETF, FuncArbitrageData=PerMinObj.FetchFullDayPerMinArbitrage)
+    res = fecthArbitrageANDLivePrices(etfname=etfname, FuncETFPrices=PerMinObj.FetchFullDayPricesForETF, FuncArbitrageData=PerMinObj.FetchFullDayPerMinArbitrage, SingleUpdate=False)
     res['Prices']=res['Prices'].to_csv(sep='\t', index=False)
     res['pnlstatementforday'] = json.dumps(AnalyzeDaysPerformance(ArbitrageDf=res['Arbitrage'],etfname=etfname))
-    res['SignalCategorization'] = json.dumps(CategorizeSignals(ArbitrageDf=res['Arbitrage']))
+    res['SignalCategorization'] = json.dumps(CategorizeSignals(ArbitrageDf=res['Arbitrage'], ArbitrageColumnName='Arbitrage in $',PriceColumn='VWPrice',Pct_change=True))
     res['scatterPlotData'] = json.dumps(res['Arbitrage'][['ETF Change Price %','Net Asset Value Change%']].to_dict(orient='records'))
     res['Arbitrage'] = res['Arbitrage'].to_json()
     return json.dumps(res)
@@ -249,12 +249,10 @@ def SendLiveArbitrageDataSingleTicker(etfname):
 @app.route('/ETfLiveArbitrage/Single/UpdateTable/<etfname>')
 def UpdateLiveArbitrageDataTablesAndPrices(etfname):
     PerMinObj = PerMinDataOperations()
-    res = fecthArbitrageANDLivePrices(etfname=etfname, FuncETFPrices=PerMinObj.LiveFetchETFPrice, FuncArbitrageData=PerMinObj.LiveFetchPerMinArbitrage)
-    
-    print(res['Arbitrage'])
+    res = fecthArbitrageANDLivePrices(etfname=etfname, FuncETFPrices=PerMinObj.LiveFetchETFPrice, FuncArbitrageData=PerMinObj.LiveFetchPerMinArbitrage, SingleUpdate=True)
     res['Prices']=res['Prices'].to_dict()
     res['Arbitrage']=res['Arbitrage'].to_dict()
-    res['SignalInfo']=analyzeSignalPerformane(res['Arbitrage']['Arbitrage'][0])
+    res['SignalInfo']=analyzeSignalPerformane(res['Arbitrage']['Arbitrage in $'][0])
     return res
 
 

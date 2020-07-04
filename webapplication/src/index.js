@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Route, BrowserRouter as Router, Redirect, Switch } from 'react-router-dom'
+import { Route, BrowserRouter as Router, Redirect } from 'react-router-dom'
 import Container from 'react-bootstrap/Container'
 
 import Former from './Component/Form.js';
-import Description from './Component/ETF-Description';
-import HistoricalArbitrage from './Component/Historical-Arbitrage';
 import Live_Arbitrage from './Component/Live-Arbitrage';
 import Live_Arbitrage_Single from './Component/Live-Arbitrage-Single';
 import ML from './Component/Machine-Learning';
@@ -25,6 +23,7 @@ import {
 // StylesSheets
 import './static/css/style.css';
 import { ETF_Description } from './Pages/ETF_Description';
+import { HistoricalArbitragee } from './Pages/Historical_Arbitrage/index.js';
 
 const history = createBrowserHistory();
 
@@ -95,16 +94,12 @@ class App extends Component {
         </div>
       </div>
       <Container fluid style={{'backgroundColor':'#292b2c'}}>
-        {/* <Route path="/ETF-Description" render={() => <Description startDate={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitNewETF} />} /> */}
-        {/* <Route path="/HistoricalArbitrage" render={() => <HistoricalArbitrage startDate ={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitFn} />} /> */}
-        {/* <Route path="/Live-Arbitrage-Single" render={() => <Live_Arbitrage_Single ETF={this.state.ETF} />} /> */}
-        {/* <Route path="/Live-Arbitrage" render={() => <Live_Arbitrage ETF={this.state.ETF} />} /> */}
-        <Switch>
-          <PrivateRoute path="/ETF-Description" startDate={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitNewETF} component={ETF_Description}/>
-          <PrivateRoute path="/HistoricalArbitrage" component={HistoricalArbitrage} startDate ={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitFn} />
-          <PrivateRoute path="/Live-Arbitrage-Single" component={Live_Arbitrage_Single} ETF={this.state.ETF} />
-          <PrivateRoute path="/Live-Arbitrage" component={Live_Arbitrage} ETF={this.state.ETF} />
-        </Switch>
+        
+        <PrivateRoute path="/ETF-Description" startDate={this.state.startDate} ETF={this.state.ETF} submitFn={this.SubmitNewETF} component={ETF_Description}/>
+        <PrivateRoute path="/Live-Arbitrage-Single" component={Live_Arbitrage_Single} ETF={this.state.ETF} />
+        <PrivateRoute path="/Live-Arbitrage" component={Live_Arbitrage} ETF={this.state.ETF} />
+        <PrivateRoute path="/newhistoricalarbitrage" startDate ={this.state.startDate} ETF={this.state.ETF} component={HistoricalArbitragee} ETF={this.state.ETF} />
+
         <Route path="/SignUp" render={() => <SignUpFormPage />} />
         <Route path="/Login" component={SignInFormPage} />
         <Route path="/EmailVerification" component={EmailVerification} />
