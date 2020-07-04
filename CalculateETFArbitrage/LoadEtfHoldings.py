@@ -52,7 +52,7 @@ class LoadHoldingsdata(object):
     def getHoldingsDatafromDB(self, etfname, fundholdingsdate):
         try:
             if self.system_username == 'ubuntu':
-                MongoDBConnectors().get_mongoengine_readWrite_production_production()
+                MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
             else:
                 MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
                 # MongoDBConnectors().get_mongoengine_devlocal_devlocal()
@@ -94,7 +94,7 @@ class LoadHoldingsdata(object):
     def getHoldingsDataForAllETFfromDB(self, etfname):
         try:
             if self.system_username == 'ubuntu':
-                MongoDBConnectors().get_mongoengine_readWrite_production_production()
+                MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
             else:
                 MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
                 # MongoDBConnectors().get_mongoengine_devlocal_devlocal()
