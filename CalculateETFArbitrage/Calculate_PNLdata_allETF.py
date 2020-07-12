@@ -2,7 +2,7 @@ import sys, traceback
 sys.path.append('..')
 from CommonServices.ImportExtensions import *
 import pandas as pd
-import getpass
+import getpass, datetime
 from pymongo import *
 from MongoDB.MongoDBConnections import MongoDBConnectors
 from FlaskAPI.Components.ETFArbitrage.ETFArbitrageMain import AnalyzeArbitrageDataForETF
@@ -28,25 +28,30 @@ class CalculateAndSavePnLData():
         try:
             date_list = self.returnres()
             date_list.sort()
+            date_list = [date for date in date_list if date>datetime.datetime(2020,6,4)]
             etflist = pd.read_csv('../CSVFiles/250M_WorkingETFs.csv').columns.to_list()
             # final_res = []
             for date in date_list:
+                print(date)
                 try:
                     if self.sysUserName == 'ubuntu':
                         presence = MongoDBConnectors().get_pymongo_readWrite_production_production().ETF_db.PNLDataCollection.find(
-                            {'Date': date}).limit(1)
+                            {'Date': date})
                     else:
-                        presence = MongoDBConnectors().get_pymongo_devlocal_devlocal().ETF_db.PNLDataCollection.find(
-                            {'Date': date}).limit(1)
+                        presence = MongoDBConnectors().get_pymongo_readonly_devlocal_production().ETF_db.PNLDataCollection.find(
+                            {'Date': date})
 
-                    if list(presence):
+                    presence_list = list(presence)
+                    etf_already_present = [item['Symbol'] for item in presence_list]
+                    etf_to_be_done = list(set(etflist)-set(etf_already_present))
+                    if len(presence_list)==len(etflist):
                         continue
                     all_etf_arb_cursor = self.arbitragecollection.find({'dateOfAnalysis': date})
                     PNLOverDates = {}
                     final_res = []
                     # Iter over the collection results
                     for etf_arb in all_etf_arb_cursor:
-                        if etf_arb['ETFName'] in etflist:
+                        if etf_arb['ETFName'] in etf_to_be_done:
                             try:
                                 print(etf_arb['ETFName'])
                                 logger.debug(etf_arb['ETFName'])
