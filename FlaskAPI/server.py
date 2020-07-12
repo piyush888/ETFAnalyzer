@@ -82,7 +82,7 @@ def fetchHoldingsData(ETFName, StartDate):
 
 @app.route('/ETfDescription/EtfData/<ETFName>/<date>')
 def SendETFHoldingsData(ETFName, date):
-    req = request.__dict__['environ']['REQUEST_URI']
+    # req = request.__dict__['environ']['REQUEST_URI']
     try:
         allData = {}
         MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
