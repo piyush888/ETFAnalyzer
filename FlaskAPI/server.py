@@ -43,7 +43,7 @@ from FlaskAPI.Components.ETFDescription.helper import fetchETFsWithSameIssuer, f
 from CalculateETFArbitrage.LoadEtfHoldings import LoadHoldingsdata
 
 
-@app.route('/ETfDescription/getETFWithSameIssuer/<IssuerName>')
+@app.route('/api/ETfDescription/getETFWithSameIssuer/<IssuerName>')
 def getETFWithSameIssuer(IssuerName):
     etfswithsameIssuer = fetchETFsWithSameIssuer(connection, Issuer=IssuerName)
     if len(etfswithsameIssuer) == 0:
@@ -52,7 +52,7 @@ def getETFWithSameIssuer(IssuerName):
     return jsonify(etfswithsameIssuer)
 
 
-@app.route('/ETfDescription/getETFsWithSameETFdbCategory/<ETFdbCategory>')
+@app.route('/api/ETfDescription/getETFsWithSameETFdbCategory/<ETFdbCategory>')
 def getETFsWithSameETFdbCategory(ETFdbCategory):
     etfsWithSameEtfDbCategory = fetchETFsWithSameETFdbCategory(connection=connection, ETFdbCategory=ETFdbCategory)
     if len(etfsWithSameEtfDbCategory) == 0:
@@ -61,7 +61,7 @@ def getETFsWithSameETFdbCategory(ETFdbCategory):
     return jsonify(etfsWithSameEtfDbCategory)
 
 
-@app.route('/ETfDescription/getOHLCDailyData/<ETFName>/<StartDate>')
+@app.route('/api/ETfDescription/getOHLCDailyData/<ETFName>/<StartDate>')
 def fetchOHLCDailyData(ETFName, StartDate):
     StartDate = StartDate.split(' ')[0]
     OHLCData = fetchOHLCHistoricalData(etfname=ETFName, StartDate=StartDate)
@@ -69,7 +69,7 @@ def fetchOHLCDailyData(ETFName, StartDate):
     return OHLCData
 
 
-@app.route('/ETfDescription/getHoldingsData/<ETFName>/<StartDate>')
+@app.route('/api/ETfDescription/getHoldingsData/<ETFName>/<StartDate>')
 def fetchHoldingsData(ETFName, StartDate):
     print("StartDate:{}".format(StartDate))
     MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
@@ -80,9 +80,8 @@ def fetchHoldingsData(ETFName, StartDate):
     return jsonify(ETFDataObject['holdings'])
 
 
-@app.route('/ETfDescription/EtfData/<ETFName>/<date>')
+@app.route('/api/ETfDescription/EtfData/<ETFName>/<date>')
 def SendETFHoldingsData(ETFName, date):
-    # req = request.__dict__['environ']['REQUEST_URI']
     try:
         allData = {}
         MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
@@ -119,7 +118,7 @@ from FlaskAPI.Components.ETFArbitrage.helperForETFArbitrage import etfMoversChan
 
 
 # Divide Columnt into movers and the price by which they are moving
-@app.route('/PastArbitrageData/<ETFName>/<date>')
+@app.route('/api/PastArbitrageData/<ETFName>/<date>')
 def FetchPastArbitrageData(ETFName, date):
     print("Historical Data For %s & date %s" %(ETFName,str(date)))
     ColumnsForDisplay = ['Time', '$Spread', 'Arbitrage in $', 'Absolute Arbitrage',
@@ -130,20 +129,18 @@ def FetchPastArbitrageData(ETFName, date):
     # Retreive data for Components
     data, pricedf, PNLStatementForTheDay, scatterPlotData = RetrieveETFArbitrageData(etfname=ETFName, date=date,
                                                                                      magnitudeOfArbitrageToFilterOn=0)
-
-    # Check if data doesn't exsist
-    if data.empty:
-        print("No Data Exist")
-
-    ########### Code to modify the ETF Movers and Underlying with highest change %
-    # Seperate ETF Movers and the percentage of movement
-    etfmoversDictCount, highestChangeDictCount = etfMoversChangers(data)
-    ########## Code to modify the ETF Movers and Underlying with highest change %
-
-    # Sort the data frame on time since Sell and Buy are concatenated one after other
     data = data.sort_index()
-    # Time Manpulation
     data.index = data.index.time
+    data['Time'] = data.index
+    pricedf['Time']=pricedf['date']
+    pricedf['Time'] = [x.time() for x in pricedf['Time']]
+    pricedf=pd.merge(data[['Time','Over Bought/Sold']],pricedf,on='Time',how='right')
+    pricedf =pricedf[pricedf['Over Bought/Sold'].notna()]
+    del pricedf['Time']
+    
+    # Seperate ETF Movers and the Underlying with highest change %
+    etfmoversDictCount, highestChangeDictCount = etfMoversChangers(data)
+    
     data.index = data.index.astype(str)
 
     # Round of DataFrame 
@@ -155,13 +152,11 @@ def FetchPastArbitrageData(ETFName, date):
 
     # Get the price dataframe
     allData = {}
-    # Columns needed to display
     data['Time'] = data.index
     data = data[ColumnsForDisplay]
-    # PNL for all dates for the etf
-    print("Price Df")
+    print("Historical DataFrame")
     print(data)
-
+        
     allData['SignalCategorization'] = json.dumps(
         CategorizeSignals(ArbitrageDf=data, ArbitrageColumnName='Arbitrage in $', PriceColumn='T', Pct_change=False))
 
@@ -177,7 +172,7 @@ def FetchPastArbitrageData(ETFName, date):
     return json.dumps(allData)
 
 
-@app.route('/PastArbitrageData/CommonDataAcrossEtf/<ETFName>')
+@app.route('/api/PastArbitrageData/CommonDataAcrossEtf/<ETFName>')
 def fetchPNLForETFForALlDays(ETFName):
     print("All ETF PNL Statement is called")
     PNLOverDates = retrievePNLForAllDays(etfname=ETFName, magnitudeOfArbitrageToFilterOn=0)
@@ -196,7 +191,7 @@ from CommonServices.ThreadingRequests import IOBoundThreading
 import requests
 
 
-@app.route('/PastArbitrageData/DailyChange/<ETFName>/<date>')
+@app.route('/api/PastArbitrageData/DailyChange/<ETFName>/<date>')
 def getDailyChangeUnderlyingStocks(ETFName, date):
     MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
     etfdata = LoadHoldingsdata().getAllETFData(ETFName, date)
@@ -220,7 +215,7 @@ def getDailyChangeUnderlyingStocks(ETFName, date):
 from MongoDB.PerMinDataOperations import PerMinDataOperations
 
 
-@app.route('/ETfLiveArbitrage/AllTickers')
+@app.route('/api/ETfLiveArbitrage/AllTickers')
 def SendLiveArbitrageDataAllTickers():
     try:
         print("All Etfs Live Arbitrage is called")
@@ -249,11 +244,21 @@ from FlaskAPI.Components.LiveCalculations.helperLiveArbitrageSingleETF import fe
     analyzeSignalPerformane, AnalyzeDaysPerformance, CategorizeSignals
 
 
-@app.route('/ETfLiveArbitrage/Single/<etfname>')
+@app.route('/api/ETfLiveArbitrage/Single/<etfname>')
 def SendLiveArbitrageDataSingleTicker(etfname):
     PerMinObj = PerMinDataOperations()
     res = fecthArbitrageANDLivePrices(etfname=etfname, FuncETFPrices=PerMinObj.FetchFullDayPricesForETF,
                                       FuncArbitrageData=PerMinObj.FetchFullDayPerMinArbitrage, callAllDayArbitrage=True)
+    
+    pricedf= res['Prices']
+    pricedf =pricedf.reset_index(drop=True)
+    pricedf['Time']=pricedf['date']
+    pricedf['Time'] = [str(x.time()) for x in pricedf['Time']]
+    pricedf=pd.merge(res['Arbitrage'][['Time','Over Bought/Sold']],pricedf,on='Time',how='right')
+    pricedf =pricedf[pricedf['Over Bought/Sold'].notna()]
+    del pricedf['Time']
+    res['Prices'] = pricedf
+
     res['Prices'] = res['Prices'].to_csv(sep='\t', index=False)
     res['pnlstatementforday'] = json.dumps(res['pnlstatementforday'])
     res['SignalCategorization'] = json.dumps(
@@ -272,7 +277,7 @@ def SendLiveArbitrageDataSingleTicker(etfname):
     return json.dumps(res)
 
 
-@app.route('/ETfLiveArbitrage/Single/UpdateTable/<etfname>')
+@app.route('/api/ETfLiveArbitrage/Single/UpdateTable/<etfname>')
 def UpdateLiveArbitrageDataTablesAndPrices(etfname):
     PerMinObj = PerMinDataOperations()
     res = fecthArbitrageANDLivePrices(etfname=etfname, FuncETFPrices=PerMinObj.LiveFetchETFPrice,
