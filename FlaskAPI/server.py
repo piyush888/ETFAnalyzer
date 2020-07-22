@@ -322,16 +322,15 @@ from MongoDB.PerMinDataOperations import PerMinDataOperations
 def SendLiveArbitrageDataAllTickers():
     try:
         print("All Etfs Live Arbitrage is called")
-        live_data, ts = PerMinDataOperations().LiveFetchPerMinArbitrage()
+        live_data = PerMinDataOperations().LiveFetchPerMinArbitrage()
         live_data = live_data[['symbol', 'Arbitrage in $', 'ETF Trading Spread in $', 'ETF Price', 'ETF Change Price %',
                                'Net Asset Value Change%', 'ETFMover%1', 'ETFMover%2', 'ETFMover%3', 'ETFMover%4',
-                               'ETFMover%5', 'Change%1', 'Change%2', 'Change%3', 'Change%4', 'Change%5']]
+                               'ETFMover%5', 'Change%1', 'Change%2', 'Change%3', 'Change%4', 'Change%5', 'Timestamp']]
         live_data=OverBoughtBalancedOverSold(df=live_data)
         live_data.rename(columns={'Magnitude of Arbitrage': 'Absolute Arbitrage'}, inplace=True)
 
         live_data = live_data.round(3)
         live_data = live_data.fillna(0)
-        live_data['Timestamp'] = ts[0]
         print(live_data)
         print(live_data.columns)
         return jsonify(live_data.to_dict(orient='records'))
@@ -352,7 +351,6 @@ def SendLiveArbitrageDataAllTickers():
 ############################################
 # Live Arbitrage Single ETF
 ############################################
-import time
 from FlaskAPI.Components.LiveCalculations.helperLiveArbitrageSingleETF import fecthArbitrageANDLivePrices, \
     analyzeSignalPerformane, AnalyzeDaysPerformance, CategorizeSignals
 
@@ -367,7 +365,7 @@ def SendLiveArbitrageDataSingleTicker(etfname):
         pricedf= res['Prices']
         pricedf =pricedf.reset_index(drop=True)
         pricedf['Time']=pricedf['date']
-        pricedf['Time'] = [str(x.time()) for x in pricedf['Time']]
+        pricedf['Time'] = pricedf['Time'].apply(lambda x: str(x.time()))
         pricedf=pd.merge(res['Arbitrage'][['Time','Over Bought/Sold']],pricedf,on='Time',how='right')
         pricedf =pricedf[pricedf['Over Bought/Sold'].notna()]
         del pricedf['Time']
