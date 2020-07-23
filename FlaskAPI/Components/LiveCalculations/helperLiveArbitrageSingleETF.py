@@ -6,6 +6,7 @@ import numpy as np
 import sys
 from MongoDB.MongoDBConnections import MongoDBConnectors
 from FlaskAPI.Components.ETFArbitrage.ETFArbitrageMain import calculateArbitrageResults
+from FlaskAPI.Helpers.CustomAPIErrorHandle import MultipleExceptionHandler
 
 daylightSavingAdjutment = 4 if date(2020,3,8)< datetime.now().date()< date(2020,11,1) else 5
 etmoverslist = ['ETFMover%1', 'ETFMover%2', 'ETFMover%3', 'ETFMover%4', 'ETFMover%5',
@@ -29,7 +30,7 @@ def fecthArbitrageANDLivePrices(etfname=None, FuncETFPrices=None, FuncArbitrageD
         # etmoverslist.extend(changes)
 
         ArbitrageDf = ArbitrageDFSemi.merge(PriceDF, left_on='Timestamp',right_on='date', how='left')
-        ArbitrageDf =ArbitrageDf[['symbol','Timestamp','Arbitrage in $','ETF Trading Spread in $','Price','TickVolume','Net Asset Value Change%','ETF Change Price %']+etmoverslist]
+        ArbitrageDf =ArbitrageDf[['symbol','Timestamp','Arbitrage in $','ETF Trading Spread in $','Price','TickVolume','Net Asset Value Change%','ETF Change Price %','ETF Price']+etmoverslist]
         ArbitrageDf=ArbitrageDf.round(5)
         
         helperObj=Helper()
@@ -77,7 +78,9 @@ def fecthArbitrageANDLivePrices(etfname=None, FuncETFPrices=None, FuncArbitrageD
     except Exception as e:
         print("Issue in Flask app while fetching ETF Description Data")
         print(traceback.format_exc())
-        return str(e)
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        return MultipleExceptionHandler().handle_exception(exception_type=exc_type, e=e)
+        # return str(e)
 
 
 # Signal Analyzer
