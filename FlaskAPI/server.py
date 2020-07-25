@@ -15,7 +15,8 @@ from datetime import datetime, timedelta
 import traceback
 import sys, os, pathlib
 import getpass
-from FlaskAPI.Helpers.CustomAPIErrorHandle import CustomAPIErrorHandler, MultipleExceptionHandler
+from FlaskAPI.Helpers.CustomAPIErrorHandle import MultipleExceptionHandler, CustomAPIErrorHandler
+import time
 
 path = pathlib.Path(os.getcwd()).parent.parent
 path = os.path.abspath(os.path.join(path, 'ETF_Client_Hosting/build'))
@@ -141,10 +142,17 @@ def SendETFHoldingsData(ETFName, date):
 from FlaskAPI.Components.ETFArbitrage.ETFArbitrageMain import RetrieveETFArbitrageData, retrievePNLForAllDays, OverBoughtBalancedOverSold
 from FlaskAPI.Components.ETFArbitrage.helperForETFArbitrage import etfMoversChangers
 
+# Check if data is avilable only after June 5
+def checkifDateIsBeforeJuneFive(datestr):
+    date_time_obj = datetime.strptime(datestr, '%Y%m%d')
+    return datetime(2020,6,5) > date_time_obj
+
 
 # Divide Columnt into movers and the price by which they are moving
 @app.route('/api/PastArbitrageData/<ETFName>/<date>')
 def FetchPastArbitrageData(ETFName, date):
+    if checkifDateIsBeforeJuneFive(date):
+        return CustomAPIErrorHandler().handle_error('Data not available before June 5th 2020, please choose a date after 5th June', 500)
     try:
         print("Historical Data For %s & date %s" %(ETFName,str(date)))
         ColumnsForDisplay = ['Time', '$Spread', 'Arbitrage in $', 'Absolute Arbitrage',
@@ -190,7 +198,7 @@ def FetchPastArbitrageData(ETFName, date):
 
         allData['etfhistoricaldata'] = data.to_json()
         allData['ArbitrageCumSum'] = data[::-1][['Arbitrage in $', 'Time']].to_dict('records')
-        allData['etfPrices'] = pricedf.to_csv(sep='\t', index=False)
+        allData['etfPrices'] = pricedf[::-1].to_csv(sep='\t', index=False)
         allData['PNLStatementForTheDay'] = json.dumps(PNLStatementForTheDay)
         allData['scatterPlotData'] = json.dumps(scatterPlotData)
         allData['etfmoversDictCount'] = json.dumps(etfmoversDictCount)
@@ -230,6 +238,8 @@ import requests
 
 @app.route('/api/PastArbitrageData/DailyChange/<ETFName>/<date>')
 def getDailyChangeUnderlyingStocks(ETFName, date):
+    if checkifDateIsBeforeJuneFive(date):
+        return CustomAPIErrorHandler().handle_error('Data only available before June 5th 2020, please choose a date after 5th June', 500)
     try:
         MongoDBConnectors().get_mongoengine_readonly_devlocal_production()
         etfdata = LoadHoldingsdata().getAllETFData(ETFName, date)
@@ -349,11 +359,22 @@ def UpdateLiveArbitrageDataTablesAndPrices(etfname):
 ############################################
 # Get last working date
 ############################################
-from CommonServices.Holidays import LastWorkingDay
+from CommonServices.Holidays import LastWorkingDay, HolidayCheck
 @app.route('/api/LastWorkingDate/')
 def LastWorkingDate():
     lastworkinDay = LastWorkingDay(datetime.utcnow().date() - timedelta(days=2))
     return json.dumps(datetime.strftime(lastworkinDay.date(),'%Y%m%d'))
+
+@app.route('/api/ListOfHolidays')
+def ListOfHolidays():
+    mydates = pd.date_range('2020-06-05', datetime.today().date().strftime("%Y-%m-%d")).tolist()
+    print(mydates)
+    MyholidayList=[date.date().strftime("%Y-%m-%d") for date in mydates if HolidayCheck(date)]
+    print("*******")
+    print(MyholidayList)
+    print("*******")
+    return jsonify({'HolidayList':MyholidayList})
+    
 
 
 if __name__ == '__main__':
