@@ -1,37 +1,26 @@
-import sys
+import sys,os, pathlib
 sys.path.append("..")
-from pymongo.errors import ConnectionFailure,ServerSelectionTimeoutError
-from flask import Flask, request, jsonify, render_template, Response
+import getpass
+from flask import Flask, jsonify, render_template, Response
 from flask_cors import CORS
 from mongoengine import *
-import sys
 import json
 import pandas as pd
-from mongoengine import connect
 import numpy as np
-import math
-import ast
 from datetime import datetime, timedelta
 import traceback
-import sys, os, pathlib
-import getpass
 from FlaskAPI.Helpers.CustomAPIErrorHandle import MultipleExceptionHandler, CustomAPIErrorHandler
-import time
+from MongoDB.MongoDBConnections import MongoDBConnectors
+from FlaskAPI.Helpers.FlaskAppMaker import flaskAppMaker
 
-path = pathlib.Path(os.getcwd()).parent.parent
-path = os.path.abspath(os.path.join(path, 'ETF_Client_Hosting/build'))
-app = Flask(__name__, static_folder=path, static_url_path='/', template_folder=path)
+connection = MongoDBConnectors().get_pymongo_readonly_devlocal_production()
+
+app = flaskAppMaker().create_app()
 
 CORS(app)
 
-from MongoDB.MongoDBConnections import MongoDBConnectors
-
-system_username = getpass.getuser()
-if system_username == 'ubuntu':
-    connection = MongoDBConnectors().get_pymongo_readonly_devlocal_production()
-else:
-    connection = MongoDBConnectors().get_pymongo_readonly_devlocal_production()
-
+# if sys.platform.startswith('linux') and getpass.getuser() == 'ubuntu':
+#     flaskAppMaker().get_index_page()
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -221,6 +210,7 @@ def fetchPNLForETFForALlDays(ETFName):
         PNLOverDates.columns = ['Sell Return%', 'Buy Return%', '# T.Buy', '# R.Buy', '% R.Buy', '# T.Sell', '# R.Sell',
                                 '% R.Sell',
                                 'Magnitue Of Arbitrage', 'Date']
+        PNLOverDates = PNLOverDates.dropna()
         PNLOverDates = PNLOverDates.to_dict(orient='records')
         print("PNLOverDates: "+str(PNLOverDates))
         return jsonify(PNLOverDates)
